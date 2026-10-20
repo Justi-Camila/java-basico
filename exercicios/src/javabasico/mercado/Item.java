@@ -7,10 +7,6 @@ public class Item {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public int getQuantidade() {
         return quantidade;
     }
@@ -37,7 +33,7 @@ public class Item {
     private int quantidade;
     private BigDecimal valor;
 
-    public BigDecimal valorTotalItem() {
+    public BigDecimal subTotal() {
         return getValor().multiply(BigDecimal.valueOf(getQuantidade()));
     }
 
