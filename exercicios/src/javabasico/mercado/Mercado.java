@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
-import static javabasico.mercado.Leitor.*;
+import static utils.Leitor.*;
 import static javabasico.mercado.enums.Pagamento.CARTAO;
 import static javabasico.mercado.enums.Pagamento.PIX;
 

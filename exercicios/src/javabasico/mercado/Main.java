@@ -1,6 +1,6 @@
 package javabasico.mercado;
 
-import static javabasico.mercado.Leitor.lerInteiro;
+import static utils.Leitor.lerInteiro;
 
 public class Main {
     static Mercado mercado =  new Mercado();
