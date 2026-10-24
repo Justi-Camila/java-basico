@@ -1,7 +1,5 @@
 package POO.biblioteca;
 
-import javabasico.mercado.Item;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +22,14 @@ public class Biblioteca {
 
             livros.add(new Livro(titulo, autor, preco, quantidade));
             System.out.printf("Livro %s adicionado com sucesso!\n\n", titulo);
-            return;
         }
-
-        if (aumentarQuantidade(livro, quantidade)) {
-            livro.setPreco(preco);
-            System.out.printf("Valor atualizado para R$%.2f | Quantidade atual: %s\n\n", preco, livro.getQuantidadeEstoque());
-        }
-
     }
 
     private void exibirDetalhesTodosLivros() {
+        if (livros.isEmpty()) {
+            System.out.println("Nenhum livro encontrado!\n");
+            return;
+        }
         livros.forEach(Livro::exibirDetalhes);
     }
 
@@ -47,13 +42,14 @@ public class Biblioteca {
         return null;
     }
 
-    private Livro buscarPorAutor(String autor) {
+    private List<Livro> buscarPorAutor(String autor) {
+        List<Livro> livrosAutor = new ArrayList<>();
         for (Livro livro : livros) {
             if (livro.getAutor().equalsIgnoreCase(autor)) {
-                return livro;
+                livrosAutor.add(livro);
             }
         }
-        return null;
+        return livrosAutor;
     }
 
     private void editarDadosLivro() {
@@ -66,54 +62,10 @@ public class Biblioteca {
                 """);
 
         switch (opcao) {
-            case 1 -> {
-                editarTitulo();
-            }
-            case 2 -> {
-                editarAutor();
-            }
-            case 3 -> {
-                int escolha = getEscolha();
-                if (escolha == 1) {
-                    String titulo = lerNome("Qual o titulo do livro? ");
-                    Livro editarPreco = buscarPorTitulo(titulo);
-                    if (buscarPorTitulo(titulo) != null) {
-                        assert editarPreco != null;
-                        System.out.printf("O livro %s foi encontrado com sucesso!\n\n", editarPreco.getTitulo());
-                        alterarValor(editarPreco);
-                    }
-                    System.out.println("O livro não foi encontrado\n");
-
-                } else if (escolha == 2) {
-                    String autor = lerNome("Qual o autor do livro? ");
-                    Livro editarPreco = buscarPorAutor(autor);
-                    if (buscarPorAutor(autor) != null) {
-                        assert editarPreco != null;
-                        System.out.printf("O livro %s foi encontrado com sucesso!\n\n", editarPreco.getTitulo());
-                        alterarValor(editarPreco);
-                    }
-                    System.out.println("O livro não foi encontrado\n");
-
-                } else {
-                    System.out.println("Escolha inválida\n");
-                }
-            }
-            case 4 -> {
-                int escolha = getEscolha();
-                if (escolha == 1) {
-                    String titulo = lerNome("Qual o titulo do livro? ");
-                    Livro editarQuantidade = buscarPorTitulo(titulo);
-                    alterarQuantidade(editarQuantidade);
-
-                } else if (escolha == 2) {
-                    String autor = lerNome("Qual o autor do livro? ");
-                    Livro editarQuantidade = buscarPorAutor(autor);
-                    alterarQuantidade(editarQuantidade);
-
-                } else {
-                    System.out.println("Escolha inválida\n");
-                }
-            }
+            case 1 -> editarTitulo();
+            case 2 -> editarAutor();
+            case 3 -> alterarValor(buscarLivroEscolha());
+            case 4 -> alterarQuantidade(buscarLivroEscolha());
             default -> System.out.println("Escolha inválida\n");
         }
     }
@@ -137,24 +89,20 @@ public class Biblioteca {
             switch (opcao) {
                 case 1 -> adicionar();
                 case 2 -> exibirDetalhesTodosLivros();
-                case 3 -> {
-                    if (buscarTitulo() != null) {
-                        System.out.println("O livro %s foi encontrado com sucesso!\n");
-                        return;
-                    }
-                    System.out.println("O livro não foi encontrado\n");
-                }
-                case 4 -> {
-                    if (buscarAutor() != null) {
-                        System.out.println("O livro %s foi encontrado com sucesso!\n");
-                        return;
-                    }
-                    System.out.println("O livro não foi encontrado\n");
-                }
+                case 3 -> buscarLivroPeloTitulo(buscarTitulo());
+                case 4 -> buscarLivroPeloTitulo(buscarAutor());
                 case 5 -> editarDadosLivro();
                 case 6 -> System.out.println("Saindo...");
                 default -> System.out.println("Escolha inválida\n");
             }
+        }
+    }
+
+    private void buscarLivroPeloTitulo(Livro titulo) {
+        if (titulo != null) {
+            titulo.exibirDetalhes();
+        } else {
+            System.out.println("O livro não foi encontrado\n");
         }
     }
 
@@ -189,30 +137,64 @@ public class Biblioteca {
     }
 
     private Livro buscarAutor() {
-        String autor = lerNome("Qual o nome do autor que deseja editar? ");
-        return buscarPorAutor(autor);
+        String autor = lerNome("Qual o nome do autor? ");
+        return selecionarLivroAutor(autor);
     }
 
     private void editarAutor() {
-        String autor = buscarAutor().getAutor();
-        buscarAutor().setAutor(autor);
+        Livro autor = buscarTitulo();
+        if (autor == null) {
+            System.out.println("O autor não foi encontrado\n");
+            return;
+        }
+        autor.setAutor(lerNome("Qual o novo autor? "));
         System.out.println("Autor editado com sucesso!\n");
     }
 
     private Livro buscarTitulo() {
-        String titulo = lerNome("Qual o nome do autor que deseja editar? ");
+        String titulo = lerNome("Qual o nome do titulo? ");
         return buscarPorTitulo(titulo);
     }
 
     private void editarTitulo() {
-        String titulo = buscarTitulo().getTitulo();
-        buscarTitulo().setTitulo(titulo);
+        Livro livro = buscarTitulo();
+        if (livro == null) {
+            System.out.println("O livro não foi encontrado\n");
+            return;
+        }
+        livro.setTitulo(lerNome("Qual o novo titulo? "));
         System.out.println("Titulo editado com sucesso!\n");
     }
 
-    private boolean aumentarQuantidade(Livro livro, int quantidade) {
-        if (limiteInvalido(livro.getQuantidadeEstoque(), quantidade)) return false;
-        livro.setQuantidadeEstoque(livro.getQuantidadeEstoque() + quantidade);
-        return true;
+    private Livro selecionarLivroAutor(String autor) {
+        List<Livro> encontrados = buscarPorAutor(autor);
+
+        if (encontrados.isEmpty()) return null;
+        if (encontrados.size() == 1) return encontrados.getFirst();
+
+        System.out.println("\nEsse autor tem mais de um livro: ");
+        for (int i = 0; i < encontrados.size(); i++) {
+            System.out.printf("%d - %s\n", i + 1, encontrados.get(i).getTitulo());
+        }
+
+        while (true) {
+            int escolha = lerInteiroPositivo("Qual deles você deseja selecionar? ");
+            if (escolha <= encontrados.size()) {
+                return encontrados.get(escolha - 1);
+            }
+            System.out.println("Escolha inválida\n");
+        }
+    }
+
+    private Livro buscarLivroEscolha() {
+        int escolha = getEscolha();
+        if (escolha == 1) {
+            return buscarPorTitulo(lerNome("Qual o titulo do livro? "));
+        } else if (escolha == 2) {
+            return selecionarLivroAutor(lerNome("Qual o autor do livro"));
+        } else {
+            System.out.println("Escolha inválida\n");
+        }
+        return null;
     }
 }

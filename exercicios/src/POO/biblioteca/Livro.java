@@ -53,8 +53,7 @@ public class Livro {
                 Autor: %s
                 Preço: %.2f
                 Quantidade em estoque: %s
-                \n
+                
                 """, titulo, autor, preco, quantidadeEstoque);
-
     }
 }
